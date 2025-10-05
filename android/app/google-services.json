@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110594864851",
+    "project_id": "handy-login",
+    "storage_bucket": "handy-login.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110594864851:android:29fd6f71e2ebb1235b4626",
+        "android_client_info": {
+          "package_name": "com.example.handsy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARE_2kMjzojEoGSgAOj50GSFSn_8tWEbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
