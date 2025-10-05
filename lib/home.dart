@@ -53,6 +53,8 @@ class _HomePageState extends State<HomePage> {
     {'name': 'TEETHYS', 'avatar': 'assets/images/profile2.jpg', 'isAdd': 'false'},
     {'name': 'ArtWear', 'avatar': 'assets/images/profile3.jpg', 'isAdd': 'false'},
     {'name': 'UrbanArt', 'avatar': 'assets/images/profile4.jpg', 'isAdd': 'false'},
+    {'name': 'StyleCo', 'avatar': 'assets/images/profile1.jpg', 'isAdd': 'false'},
+    {'name': 'DesignX', 'avatar': 'assets/images/profile2.jpg', 'isAdd': 'false'},
   ];
 
   @override
@@ -83,20 +85,16 @@ class _HomePageState extends State<HomePage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.menu, color: Color(0xFF6366F1)),
-          ),
-          const Icon(
-            Icons.palette,
-            color: Color(0xFF6366F1),
-            size: 32,
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.auto_awesome_outlined, color: Color(0xFF6366F1)),
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'HANDSY',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+              letterSpacing: 1.2,
+            ),
           ),
         ],
       ),
@@ -104,20 +102,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildStories() {
-    return Container(
-      height: 100,
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
+    return SizedBox(
+      height: 90,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: stories.length,
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
         itemBuilder: (context, index) {
           final story = stories[index];
           final isAdd = story['isAdd'] == 'true';
           
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
+          return Container(
+            width: 70,
+            margin: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
                   width: 60,
@@ -150,7 +149,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
                 Text(
                   story['name']!,
                   style: TextStyle(
@@ -160,6 +159,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),

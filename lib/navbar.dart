@@ -3,69 +3,7 @@ import 'profile.dart';
 import 'favorite.dart';
 import 'discover.dart';
 import 'home.dart';
-
-class CustomizePage extends StatelessWidget {
-  const CustomizePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              // Header
-              const Text(
-                'Customize',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-
-              const Spacer(),
-
-              // Placeholder content
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey[200]!),
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.palette, color: Color(0xFF6366F1), size: 48),
-                    SizedBox(height: 12),
-                    Text(
-                      'Customize Page',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      'Create your custom pieces',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-
-              const Spacer(),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+import 'customize.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
