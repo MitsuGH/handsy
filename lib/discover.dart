@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'product_detail.dart';
+import 'favorites_manager.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -10,6 +11,9 @@ class DiscoverPage extends StatefulWidget {
 
 class _DiscoverPageState extends State<DiscoverPage> {
   final TextEditingController _searchController = TextEditingController();
+  final FavoritesManager _favoritesManager = FavoritesManager();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _trendingKey = GlobalKey();
   String _selectedCategory = 'All';
 
   final List<String> categories = [
@@ -32,7 +36,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'L',
       'description':
           'These jeans were inspired by the idea of angels and god. I hand-painted every detail to capture that energy, blending chaos and grace in each stroke. No two pieces are ever the same, and this one is truly one of a kind. Thank you for supporting handmade art and the stories we tell through it.',
-      'isFavorite': false,
       'designer': 'handcukk',
       'rating': 4.9,
     },
@@ -46,7 +49,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'M',
       'description':
           'Unique smokewave pattern hand-painted jeans. Each piece is meticulously crafted to create a one-of-a-kind artistic statement.',
-      'isFavorite': false,
       'designer': 'TEETHYS',
       'rating': 4.8,
     },
@@ -60,7 +62,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'XL',
       'description':
           'Cosmic galaxy design with vibrant colors. Perfect for standing out.',
-      'isFavorite': false,
       'designer': 'ArtWear',
       'rating': 4.7,
     },
@@ -74,7 +75,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'L',
       'description':
           'Bold street art inspired design. Perfect for urban fashion lovers.',
-      'isFavorite': false,
       'designer': 'UrbanCanvas',
       'rating': 4.6,
     },
@@ -90,7 +90,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'M',
       'description':
           'Hand-embroidered floral patterns inspired by Thai traditional art.',
-      'isFavorite': false,
       'designer': 'StitchDreams',
       'rating': 4.9,
     },
@@ -104,7 +103,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'S',
       'description':
           'Contemporary abstract art meets fashion. Unique piece for art enthusiasts.',
-      'isFavorite': false,
       'designer': 'ArtWear',
       'rating': 4.8,
     },
@@ -118,7 +116,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'M',
       'description':
           'Hand-painted vintage style denim jacket. Timeless piece.',
-      'isFavorite': false,
       'designer': 'handcukk',
       'rating': 4.7,
     },
@@ -132,7 +129,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'S',
       'description':
           'Soft pastel colors with dreamy patterns. Perfect for everyday wear.',
-      'isFavorite': false,
       'designer': 'TEETHYS',
       'rating': 4.6,
     },
@@ -148,7 +144,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'L',
       'description':
           'Celebrate pride with this vibrant hand-painted design. Love is love.',
-      'isFavorite': false,
       'designer': 'UrbanCanvas',
       'rating': 4.9,
     },
@@ -162,7 +157,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'M',
       'description':
           'Bold rainbow splash design. Express yourself with pride.',
-      'isFavorite': false,
       'designer': 'ArtWear',
       'rating': 4.8,
     },
@@ -176,7 +170,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'M',
       'description':
           'Unity and diversity in art form. Wear your pride.',
-      'isFavorite': false,
       'designer': 'StitchDreams',
       'rating': 4.7,
     },
@@ -192,7 +185,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'One Size',
       'description':
           'Hand-crafted beaded bracelet with unique patterns.',
-      'isFavorite': false,
       'designer': 'handcukk',
       'rating': 4.8,
     },
@@ -206,7 +198,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'Adjustable',
       'description':
           'Unique hand-painted cap. Stand out from the crowd.',
-      'isFavorite': false,
       'designer': 'TEETHYS',
       'rating': 4.6,
     },
@@ -220,7 +211,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'size': 'Large',
       'description':
           'Durable canvas tote with custom art. Eco-friendly and stylish.',
-      'isFavorite': false,
       'designer': 'ArtWear',
       'rating': 4.7,
     },
@@ -247,11 +237,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
             _buildCategories(),
             Expanded(
               child: ListView(
+                controller: _scrollController,
                 padding: const EdgeInsets.all(24.0),
                 children: [
                   _buildFeaturedSection(),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('Trending Now', 'See all'),
+                  Container(
+                    key: _trendingKey,
+                    child: _buildSectionHeader('Trending Now', 'See all'),
+                  ),
                   const SizedBox(height: 16),
                   _buildProductsGrid(context),
                   const SizedBox(height: 80),
@@ -311,9 +305,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
             hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
             prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
             suffixIcon: IconButton(
-              onPressed: () {
-                // Filter action
-              },
+              onPressed: () {},
               icon: Icon(Icons.tune, color: Colors.grey[700]),
             ),
             border: InputBorder.none,
@@ -378,11 +370,20 @@ class _DiscoverPageState extends State<DiscoverPage> {
   Widget _buildFeaturedSection() {
     return GestureDetector(
       onTap: () {
-        // Navigate to featured collection
+        // Scroll to trending section
+        final RenderBox? renderBox = _trendingKey.currentContext?.findRenderObject() as RenderBox?;
+        if (renderBox != null) {
+          final offset = renderBox.localToGlobal(Offset.zero).dy;
+          _scrollController.animateTo(
+            _scrollController.offset + offset - 100,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
       },
       child: Container(
         width: double.infinity,
-        height: 180,
+        height: 220, // Increased from 180 to 220
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -427,7 +428,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20), // Increased from 16 to 20 for more space
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -449,6 +450,37 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 ],
               ),
             ),
+            // Artist image on the right
+            Positioned(
+              right: 0,
+              top: 20,
+              bottom: 0,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+                child: Image.asset(
+                  'assets/images/artist.png',
+                  height: 200,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomRight,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                      ),
+                      child: Icon(
+                        Icons.person,
+                        size: 80,
+                        color: Colors.white.withOpacity(0.3),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
             Positioned(
               right: -30,
               bottom: -20,
@@ -457,19 +489,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.1),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 20,
-              top: 20,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withOpacity(0.05),
                 ),
               ),
             ),
@@ -492,9 +512,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
           ),
         ),
         GestureDetector(
-          onTap: () {
-            // See all action
-          },
+          onTap: () {},
           child: Text(
             action,
             style: TextStyle(
@@ -527,208 +545,224 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Widget _buildProductCard(BuildContext context, Map<String, dynamic> product) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ProductDetailPage(product: product),
+    return AnimatedBuilder(
+      animation: _favoritesManager,
+      builder: (context, child) {
+        final isFavorite = _favoritesManager.isFavorite(product['id']);
+        
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductDetailPage(product: product),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey[200]!),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Stack(
+                  children: [
+                    Container(
+                      height: 160,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                        color: Colors.grey[200],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
+                        ),
+                        child: Image.asset(
+                          product['image'],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(
+                                Icons.image,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          _favoritesManager.toggleFavorite(product);
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                isFavorite 
+                                    ? 'Removed from favorites' 
+                                    : 'Added to favorites',
+                              ),
+                              backgroundColor: Colors.black87,
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_outline,
+                            color: isFavorite
+                                ? Colors.red
+                                : Colors.grey[600],
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (product['rating'] != null)
+                      Positioned(
+                        top: 10,
+                        left: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Color(0xFFFBBF24),
+                                size: 12,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                product['rating'].toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product['title'],
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 3),
+                            if (product['designer'] != null)
+                              Text(
+                                'by ${product['designer']}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              product['price'],
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF6366F1),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6366F1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.shopping_bag_outlined,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[200]!),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image with favorite icon
-            Stack(
-              children: [
-                Container(
-                  height: 160,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                    color: Colors.grey[200],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                    child: Image.asset(
-                      product['image'],
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: const Icon(
-                            Icons.image,
-                            size: 40,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        product['isFavorite'] = !product['isFavorite'];
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        product['isFavorite']
-                            ? Icons.favorite
-                            : Icons.favorite_outline,
-                        color: product['isFavorite']
-                            ? Colors.red
-                            : Colors.grey[600],
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-                if (product['rating'] != null)
-                  Positioned(
-                    top: 10,
-                    left: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Color(0xFFFBBF24),
-                            size: 12,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            product['rating'].toString(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-
-            // Product info
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product['title'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 3),
-                        if (product['designer'] != null)
-                          Text(
-                            'by ${product['designer']}',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.grey[600],
-                              fontWeight: FontWeight.w500,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          product['price'],
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF6366F1),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.shopping_bag_outlined,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }

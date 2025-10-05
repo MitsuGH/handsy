@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'product_detail.dart';
+import 'favorites_manager.dart';
 
 class FavoritePage extends StatefulWidget {
   const FavoritePage({super.key});
@@ -9,14 +11,12 @@ class FavoritePage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritePage> {
   final TextEditingController _searchController = TextEditingController();
+  final FavoritesManager _favoritesManager = FavoritesManager();
   
   String _selectedFilter = 'All';
   final List<String> filters = ['All', 'Products'];
   
-  String _sortBy = 'Recently Added'; // Default sort
-
-  // This will store favorited products - starts empty
-  List<Map<String, dynamic>> favoriteItems = [];
+  String _sortBy = 'Recently Added';
 
   @override
   void dispose() {
@@ -24,61 +24,68 @@ class _FavoritePageState extends State<FavoritePage> {
     super.dispose();
   }
 
-  void _sortFavorites() {
-    setState(() {
-      switch (_sortBy) {
-        case 'Price: Low to High':
-          favoriteItems.sort((a, b) {
-            double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
-            double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
-            return priceA.compareTo(priceB);
-          });
-          break;
-        case 'Price: High to Low':
-          favoriteItems.sort((a, b) {
-            double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
-            double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
-            return priceB.compareTo(priceA);
-          });
-          break;
-        case 'Rating':
-          favoriteItems.sort((a, b) {
-            double ratingA = a['rating'] ?? 0.0;
-            double ratingB = b['rating'] ?? 0.0;
-            return ratingB.compareTo(ratingA);
-          });
-          break;
-        case 'Recently Added':
-          // Keep original order (most recent first)
-          // No need to sort as items are added to the end
-          favoriteItems = favoriteItems.reversed.toList();
-          break;
-      }
-    });
+  List<Map<String, dynamic>> get sortedFavorites {
+    List<Map<String, dynamic>> items = List.from(_favoritesManager.favoriteItems);
+    
+    switch (_sortBy) {
+      case 'Price: Low to High':
+        items.sort((a, b) {
+          double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+          double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+          return priceA.compareTo(priceB);
+        });
+        break;
+      case 'Price: High to Low':
+        items.sort((a, b) {
+          double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+          double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+          return priceB.compareTo(priceA);
+        });
+        break;
+      case 'Rating':
+        items.sort((a, b) {
+          double ratingA = a['rating'] ?? 0.0;
+          double ratingB = b['rating'] ?? 0.0;
+          return ratingB.compareTo(ratingA);
+        });
+        break;
+      case 'Recently Added':
+        items = items.reversed.toList();
+        break;
+    }
+    
+    return items;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            _buildSearchBar(),
-            if (favoriteItems.isNotEmpty) _buildFilters(),
-            Expanded(
-              child: favoriteItems.isEmpty
-                  ? _buildEmptyState()
-                  : _buildFavoritesGrid(),
+    return AnimatedBuilder(
+      animation: _favoritesManager,
+      builder: (context, child) {
+        final favorites = sortedFavorites;
+        
+        return Scaffold(
+          backgroundColor: Colors.white,
+          body: SafeArea(
+            child: Column(
+              children: [
+                _buildHeader(favorites.length),
+                _buildSearchBar(favorites.isNotEmpty),
+                if (favorites.isNotEmpty) _buildFilters(),
+                Expanded(
+                  child: favorites.isEmpty
+                      ? _buildEmptyState()
+                      : _buildFavoritesGrid(favorites),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(int count) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Row(
@@ -92,7 +99,7 @@ class _FavoritePageState extends State<FavoritePage> {
               color: Colors.black,
             ),
           ),
-          if (favoriteItems.isNotEmpty)
+          if (count > 0)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
@@ -100,7 +107,7 @@ class _FavoritePageState extends State<FavoritePage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                '${favoriteItems.length} items',
+                '$count ${count == 1 ? "item" : "items"}',
                 style: const TextStyle(
                   color: Color(0xFF6366F1),
                   fontWeight: FontWeight.w600,
@@ -113,7 +120,7 @@ class _FavoritePageState extends State<FavoritePage> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(bool showSort) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: Container(
@@ -134,7 +141,7 @@ class _FavoritePageState extends State<FavoritePage> {
               Icons.search,
               color: Colors.grey[400],
             ),
-            suffixIcon: favoriteItems.isNotEmpty
+            suffixIcon: showSort
                 ? IconButton(
                     onPressed: () {
                       _showSortOptions();
@@ -202,7 +209,7 @@ class _FavoritePageState extends State<FavoritePage> {
     );
   }
 
-  Widget _buildFavoritesGrid() {
+  Widget _buildFavoritesGrid(List<Map<String, dynamic>> favorites) {
     return GridView.builder(
       padding: const EdgeInsets.all(24.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -211,9 +218,9 @@ class _FavoritePageState extends State<FavoritePage> {
         mainAxisSpacing: 20,
         childAspectRatio: 0.70,
       ),
-      itemCount: favoriteItems.length,
+      itemCount: favorites.length,
       itemBuilder: (context, index) {
-        return _buildFavoriteCard(favoriteItems[index]);
+        return _buildFavoriteCard(favorites[index]);
       },
     );
   }
@@ -221,7 +228,12 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget _buildFavoriteCard(Map<String, dynamic> item) {
     return GestureDetector(
       onTap: () {
-        // Navigate to product detail
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailPage(product: item),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
@@ -239,7 +251,6 @@ class _FavoritePageState extends State<FavoritePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image with favorite and rating
             Stack(
               children: [
                 Container(
@@ -336,8 +347,6 @@ class _FavoritePageState extends State<FavoritePage> {
                   ),
               ],
             ),
-
-            // Product info
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -443,7 +452,7 @@ class _FavoritePageState extends State<FavoritePage> {
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () {
-              // Navigate to discover
+              // This will be handled by navigation bar
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
@@ -550,7 +559,6 @@ class _FavoritePageState extends State<FavoritePage> {
           _sortBy = title;
         });
         Navigator.pop(context);
-        _sortFavorites();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Sorted by: $title'),
@@ -591,9 +599,7 @@ class _FavoritePageState extends State<FavoritePage> {
           ),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                favoriteItems.remove(item);
-              });
+              _favoritesManager.removeFavorite(item);
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
