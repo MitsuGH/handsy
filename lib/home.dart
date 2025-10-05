@@ -10,15 +10,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final List<Map<String, dynamic>> posts = [
     {
-      'username': 'ArtisanThreads',
-      'handle': '@artisan_threads',
+      'username': 'marko',
+      'handle': '@marko_customarts',
       'time': '2h',
       'text': 'Just finished this custom galaxy-painted denim jacket! The colors shift from deep purple to cosmic blue. Each piece tells a story.',
-      'image': 'assets/images/jacket1.jpg',
+      'image': 'assets/images/galaxy-jacket.png',
       'likes': 124,
       'retweets': 18,
       'comments': 34,
-      'avatar': 'assets/images/profile1.jpg',
+      'avatar': 'assets/images/marko.jpg',
       'isLiked': false,
     },
     {
@@ -26,11 +26,11 @@ class _HomePageState extends State<HomePage> {
       'handle': '@urban_canvas',
       'time': '5h',
       'text': 'Hand-painted streetwear is the future! No two pieces are ever the same. That\'s the beauty of custom fashion.',
-      'image': 'assets/images/hoodie1.jpg',
+      'image': 'assets/images/colorful-jacket.jpg',
       'likes': 89,
       'retweets': 12,
       'comments': 15,
-      'avatar': 'assets/images/profile2.jpg',
+      'avatar': 'assets/images/urban-canvas.jpg',
       'isLiked': true,
     },
     {
@@ -38,23 +38,22 @@ class _HomePageState extends State<HomePage> {
       'handle': '@stitch_dreams',
       'time': '8h',
       'text': 'New embroidery technique I\'ve been working on. These floral patterns are inspired by traditional Thai art. Available for custom orders!',
-      'image': 'assets/images/shirt1.jpg',
+      'image': 'assets/images/thai-suit.jpg',
       'likes': 256,
       'retweets': 45,
       'comments': 67,
-      'avatar': 'assets/images/profile3.jpg',
+      'avatar': 'assets/images/stitch.jpg',
       'isLiked': false,
     },
   ];
 
   final List<Map<String, String>> stories = [
     {'name': 'Add', 'avatar': '', 'isAdd': 'true'},
-    {'name': 'handcukk', 'avatar': 'assets/images/profile1.jpg', 'isAdd': 'false'},
-    {'name': 'TEETHYS', 'avatar': 'assets/images/profile2.jpg', 'isAdd': 'false'},
-    {'name': 'ArtWear', 'avatar': 'assets/images/profile3.jpg', 'isAdd': 'false'},
-    {'name': 'UrbanArt', 'avatar': 'assets/images/profile4.jpg', 'isAdd': 'false'},
-    {'name': 'StyleCo', 'avatar': 'assets/images/profile1.jpg', 'isAdd': 'false'},
-    {'name': 'DesignX', 'avatar': 'assets/images/profile2.jpg', 'isAdd': 'false'},
+    {'name': 'handcukk', 'avatar': 'assets/images/handcukk.jpg', 'isAdd': 'false'},
+    {'name': 'TEETHYS', 'avatar': 'assets/images/teethys.jpg', 'isAdd': 'false'},
+    {'name': 'ArtWear', 'avatar': 'assets/images/artwear.jpg', 'isAdd': 'false'},
+    {'name': 'UrbanArt', 'avatar': 'assets/images/urban.jpg', 'isAdd': 'false'},
+    {'name': 'Styleco', 'avatar': 'assets/images/styleco.png', 'isAdd': 'false'},
   ];
 
   @override
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Colors.black,
+              color: Color.fromARGB(255, 99, 102, 241),
               letterSpacing: 1.2,
             ),
           ),
@@ -103,7 +102,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildStories() {
     return SizedBox(
-      height: 90,
+      height: 100,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: stories.length,
@@ -113,14 +112,14 @@ class _HomePageState extends State<HomePage> {
           final isAdd = story['isAdd'] == 'true';
           
           return Container(
-            width: 70,
+            width: 72,
             margin: const EdgeInsets.symmetric(horizontal: 4.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: 64,
+                  height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: isAdd ? null : const LinearGradient(
@@ -129,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                     border: isAdd ? Border.all(color: Colors.grey[300]!, width: 2) : null,
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(isAdd ? 0 : 2.0),
+                    padding: EdgeInsets.all(isAdd ? 0 : 2.5),
                     child: Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
@@ -140,9 +139,15 @@ class _HomePageState extends State<HomePage> {
                           : Padding(
                               padding: const EdgeInsets.all(2.0),
                               child: ClipOval(
-                                child: Container(
-                                  color: Colors.grey[300],
-                                  child: const Icon(Icons.person, color: Colors.grey),
+                                child: Image.asset(
+                                  story['avatar']!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey[300],
+                                      child: const Icon(Icons.person, color: Colors.grey),
+                                    );
+                                  },
                                 ),
                               ),
                             ),
@@ -180,14 +185,24 @@ class _HomePageState extends State<HomePage> {
               // Post header
               Row(
                 children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey,
+                  ClipOval(
+                    child: Image.asset(
+                      post['avatar'],
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 48,
+                          height: 48,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey,
+                          ),
+                          child: const Icon(Icons.person, color: Colors.white),
+                        );
+                      },
                     ),
-                    child: const Icon(Icons.person, color: Colors.white),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -245,19 +260,24 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 12),
               
               // Post image
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  color: Colors.grey[200],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    color: Colors.grey[300],
-                    child: const Icon(Icons.image, size: 40, color: Colors.grey),
-                  ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  post['image'],
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.grey[200],
+                      ),
+                      child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                    );
+                  },
                 ),
               ),
               

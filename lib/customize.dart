@@ -15,46 +15,46 @@ class _CustomizePageState extends State<CustomizePage>
   final List<Map<String, dynamic>> designers = [
     {
       'name': 'handcukk',
-      'avatar': 'assets/images/profile1.jpg',
+      'avatar': 'assets/images/handcukk.jpg',
       'specialty': 'Hand-painted Denim',
       'rating': 4.9,
       'reviews': 234,
       'price': 'From ฿1,500',
       'turnaround': '5-7 days',
       'portfolio': [
-        'assets/images/pant1.jpg',
-        'assets/images/pant2.jpg',
-        'assets/images/jacket1.jpg',
+        'assets/images/skull-jean.png',
+        'assets/images/japan-jean.png',
+        'assets/images/red-jean.png',
       ],
       'isVerified': true,
     },
     {
       'name': 'TEETHYS',
-      'avatar': 'assets/images/profile2.jpg',
+      'avatar': 'assets/images/teethys.jpg',
       'specialty': 'Embroidery & Patches',
       'rating': 4.8,
       'reviews': 189,
       'price': 'From ฿2,000',
       'turnaround': '7-10 days',
       'portfolio': [
-        'assets/images/hoodie1.jpg',
-        'assets/images/shirt1.jpg',
-        'assets/images/hoodie2.jpg',
+        'assets/images/em-jacket.png',
+        'assets/images/em-jacket2.jpg',
+        'assets/images/em-jacket3.jpg',
       ],
       'isVerified': true,
     },
     {
       'name': 'ArtWear',
-      'avatar': 'assets/images/profile3.jpg',
+      'avatar': 'assets/images/artwear.png',
       'specialty': 'Abstract Painting',
       'rating': 4.7,
       'reviews': 156,
       'price': 'From ฿1,800',
       'turnaround': '5-7 days',
       'portfolio': [
-        'assets/images/hoodie3.jpg',
-        'assets/images/jacket1.jpg',
-        'assets/images/shirt1.jpg',
+        'assets/images/paint-jacket.jpg',
+        'assets/images/paint-jacket2.jpg',
+        'assets/images/paint-jean.jpg',
       ],
       'isVerified': false,
     },
@@ -63,10 +63,10 @@ class _CustomizePageState extends State<CustomizePage>
   final List<Map<String, dynamic>> requests = [
     {
       'user': 'lilmitzzz',
-      'avatar': 'assets/images/profile4.jpg',
+      'avatar': 'assets/images/lilmitz.jpg',
       'time': '2h ago',
-      'description': 'Looking for someone to paint a galaxy theme on my denim jacket. Budget: ฿2,500',
-      'image': 'assets/images/jacket1.jpg',
+      'description': 'Looking for someone to paint a christ theme on my denim jacket. Budget: ฿2,500',
+      'image': 'assets/images/denim-jacket.jpg',
       'budget': '฿2,500',
       'deadline': '2 weeks',
       'offers': 8,
@@ -74,10 +74,10 @@ class _CustomizePageState extends State<CustomizePage>
     },
     {
       'user': 'styleking',
-      'avatar': 'assets/images/profile2.jpg',
+      'avatar': 'assets/images/styleking.jpg',
       'time': '5h ago',
       'description': 'Need custom embroidery on white hoodie. Minimalist design preferred. Budget: ฿1,800',
-      'image': 'assets/images/hoodie1.jpg',
+      'image': 'assets/images/white-hoodie.jpg',
       'budget': '฿1,800',
       'deadline': '1 week',
       'offers': 12,
@@ -85,10 +85,10 @@ class _CustomizePageState extends State<CustomizePage>
     },
     {
       'user': 'fashionista_bkk',
-      'avatar': 'assets/images/profile3.jpg',
+      'avatar': 'assets/images/bkkmodel.jpg',
       'time': '1d ago',
       'description': 'Want to customize my jeans with hand-painted flowers. Open to creative ideas!',
-      'image': 'assets/images/pant1.jpg',
+      'image': 'assets/images/jeans.jpg',
       'budget': '฿3,000',
       'deadline': '3 weeks',
       'offers': 15,
@@ -274,9 +274,15 @@ class _CustomizePageState extends State<CustomizePage>
                         color: Colors.white,
                       ),
                       child: ClipOval(
-                        child: Container(
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.person, color: Colors.grey),
+                        child: Image.asset(
+                          designer['avatar'],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.person, color: Colors.grey),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -362,15 +368,20 @@ class _CustomizePageState extends State<CustomizePage>
                 return Container(
                   width: 100,
                   margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: Colors.grey[200],
-                  ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      color: Colors.grey[300],
-                      child: const Icon(Icons.image, color: Colors.grey),
+                    child: Image.asset(
+                      designer['portfolio'][index],
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey[200],
+                          ),
+                          child: const Icon(Icons.image, color: Colors.grey),
+                        );
+                      },
                     ),
                   ),
                 );
@@ -519,14 +530,24 @@ class _CustomizePageState extends State<CustomizePage>
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey,
+                ClipOval(
+                  child: Image.asset(
+                    request['avatar'],
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey,
+                        ),
+                        child: const Icon(Icons.person, color: Colors.white),
+                      );
+                    },
                   ),
-                  child: const Icon(Icons.person, color: Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -589,15 +610,21 @@ class _CustomizePageState extends State<CustomizePage>
           Container(
             height: 200,
             margin: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[200],
-            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Container(
-                color: Colors.grey[300],
-                child: const Icon(Icons.image, size: 40, color: Colors.grey),
+              child: Image.asset(
+                request['image'],
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey[200],
+                    ),
+                    child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                  );
+                },
               ),
             ),
           ),
