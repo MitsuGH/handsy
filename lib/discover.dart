@@ -20,14 +20,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Accessories',
   ];
 
-  final List<Map<String, dynamic>> products = [
+  final List<Map<String, dynamic>> allProducts = [
+    // Men's Products
     {
       'id': 1,
       'title': 'Saint | Custom...',
       'price': 'B1,899',
       'image': 'assets/images/pant1.jpg',
       'fullTitle': 'Saint | Custom Hand Painted Black Jeans',
-      'category': 'Jeans Men',
+      'category': 'Men',
       'size': 'L',
       'description':
           'These jeans were inspired by the idea of angels and god. I hand-painted every detail to capture that energy, blending chaos and grace in each stroke. No two pieces are ever the same, and this one is truly one of a kind. Thank you for supporting handmade art and the stories we tell through it.',
@@ -41,11 +42,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'price': 'B5,400',
       'image': 'assets/images/pant2.jpg',
       'fullTitle': 'Smokewave Pattern Custom Jeans',
-      'category': 'Jeans Men',
+      'category': 'Men',
       'size': 'M',
       'description':
           'Unique smokewave pattern hand-painted jeans. Each piece is meticulously crafted to create a one-of-a-kind artistic statement.',
-      'isFavorite': true,
+      'isFavorite': false,
       'designer': 'TEETHYS',
       'rating': 4.8,
     },
@@ -55,7 +56,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'price': 'B3,200',
       'image': 'assets/images/hoodie1.jpg',
       'fullTitle': 'Galaxy Painted Hoodie',
-      'category': 'Hoodie',
+      'category': 'Men',
       'size': 'XL',
       'description':
           'Cosmic galaxy design with vibrant colors. Perfect for standing out.',
@@ -65,11 +66,27 @@ class _DiscoverPageState extends State<DiscoverPage> {
     },
     {
       'id': 4,
+      'title': 'Urban Street...',
+      'price': 'B2,999',
+      'image': 'assets/images/hoodie2.jpg',
+      'fullTitle': 'Urban Street Art Hoodie',
+      'category': 'Men',
+      'size': 'L',
+      'description':
+          'Bold street art inspired design. Perfect for urban fashion lovers.',
+      'isFavorite': false,
+      'designer': 'UrbanCanvas',
+      'rating': 4.6,
+    },
+    
+    // Women's Products
+    {
+      'id': 5,
       'title': 'Floral Embroid...',
       'price': 'B2,800',
       'image': 'assets/images/shirt1.jpg',
       'fullTitle': 'Floral Embroidered Shirt',
-      'category': 'Shirt',
+      'category': 'Women',
       'size': 'M',
       'description':
           'Hand-embroidered floral patterns inspired by Thai traditional art.',
@@ -77,7 +94,146 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'designer': 'StitchDreams',
       'rating': 4.9,
     },
+    {
+      'id': 6,
+      'title': 'Abstract Art...',
+      'price': 'B3,500',
+      'image': 'assets/images/hoodie3.jpg',
+      'fullTitle': 'Abstract Art Hoodie',
+      'category': 'Women',
+      'size': 'S',
+      'description':
+          'Contemporary abstract art meets fashion. Unique piece for art enthusiasts.',
+      'isFavorite': false,
+      'designer': 'ArtWear',
+      'rating': 4.8,
+    },
+    {
+      'id': 7,
+      'title': 'Vintage Denim...',
+      'price': 'B4,200',
+      'image': 'assets/images/pant1.jpg',
+      'fullTitle': 'Vintage Denim Jacket',
+      'category': 'Women',
+      'size': 'M',
+      'description':
+          'Hand-painted vintage style denim jacket. Timeless piece.',
+      'isFavorite': false,
+      'designer': 'handcukk',
+      'rating': 4.7,
+    },
+    {
+      'id': 8,
+      'title': 'Pastel Dream...',
+      'price': 'B3,100',
+      'image': 'assets/images/hoodie1.jpg',
+      'fullTitle': 'Pastel Dream Hoodie',
+      'category': 'Women',
+      'size': 'S',
+      'description':
+          'Soft pastel colors with dreamy patterns. Perfect for everyday wear.',
+      'isFavorite': false,
+      'designer': 'TEETHYS',
+      'rating': 4.6,
+    },
+
+    // LGBTQ Products
+    {
+      'id': 9,
+      'title': 'Pride Painted...',
+      'price': 'B3,800',
+      'image': 'assets/images/hoodie2.jpg',
+      'fullTitle': 'Pride Painted Hoodie',
+      'category': 'LGBTQ',
+      'size': 'L',
+      'description':
+          'Celebrate pride with this vibrant hand-painted design. Love is love.',
+      'isFavorite': false,
+      'designer': 'UrbanCanvas',
+      'rating': 4.9,
+    },
+    {
+      'id': 10,
+      'title': 'Rainbow Spla...',
+      'price': 'B4,500',
+      'image': 'assets/images/pant2.jpg',
+      'fullTitle': 'Rainbow Splash Jeans',
+      'category': 'LGBTQ',
+      'size': 'M',
+      'description':
+          'Bold rainbow splash design. Express yourself with pride.',
+      'isFavorite': false,
+      'designer': 'ArtWear',
+      'rating': 4.8,
+    },
+    {
+      'id': 11,
+      'title': 'Unity Art Tee',
+      'price': 'B2,200',
+      'image': 'assets/images/shirt1.jpg',
+      'fullTitle': 'Unity Art T-Shirt',
+      'category': 'LGBTQ',
+      'size': 'M',
+      'description':
+          'Unity and diversity in art form. Wear your pride.',
+      'isFavorite': false,
+      'designer': 'StitchDreams',
+      'rating': 4.7,
+    },
+
+    // Accessories
+    {
+      'id': 12,
+      'title': 'Custom Bead...',
+      'price': 'B890',
+      'image': 'assets/images/bracelet1.png',
+      'fullTitle': 'Custom Beaded Bracelet',
+      'category': 'Accessories',
+      'size': 'One Size',
+      'description':
+          'Hand-crafted beaded bracelet with unique patterns.',
+      'isFavorite': false,
+      'designer': 'handcukk',
+      'rating': 4.8,
+    },
+    {
+      'id': 13,
+      'title': 'Painted Cap',
+      'price': 'B1,200',
+      'image': 'assets/images/hoodie3.jpg',
+      'fullTitle': 'Hand-Painted Baseball Cap',
+      'category': 'Accessories',
+      'size': 'Adjustable',
+      'description':
+          'Unique hand-painted cap. Stand out from the crowd.',
+      'isFavorite': false,
+      'designer': 'TEETHYS',
+      'rating': 4.6,
+    },
+    {
+      'id': 14,
+      'title': 'Art Tote Bag',
+      'price': 'B1,500',
+      'image': 'assets/images/pant1.jpg',
+      'fullTitle': 'Custom Art Tote Bag',
+      'category': 'Accessories',
+      'size': 'Large',
+      'description':
+          'Durable canvas tote with custom art. Eco-friendly and stylish.',
+      'isFavorite': false,
+      'designer': 'ArtWear',
+      'rating': 4.7,
+    },
   ];
+
+  List<Map<String, dynamic>> get filteredProducts {
+    if (_selectedCategory == 'All') {
+      return allProducts;
+    }
+    return allProducts
+        .where((product) => product['category'] == _selectedCategory)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -353,6 +509,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Widget _buildProductsGrid(BuildContext context) {
+    final products = filteredProducts;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

@@ -11,55 +11,50 @@ class _FavoritePageState extends State<FavoritePage> {
   final TextEditingController _searchController = TextEditingController();
   
   String _selectedFilter = 'All';
-  final List<String> filters = ['All', 'Products', 'Designers'];
+  final List<String> filters = ['All', 'Products'];
+  
+  String _sortBy = 'Recently Added'; // Default sort
 
-  final List<Map<String, dynamic>> favoriteItems = [
-    {
-      'title': 'Custom hand...',
-      'fullTitle': 'Custom hand painted galaxy hoodie',
-      'designer': 'handcukk',
-      'image': 'assets/images/hoodie2.jpg',
-      'price': 'B3,200',
-      'category': 'Hoodie',
-      'type': 'product',
-      'rating': 4.9,
-    },
-    {
-      'title': 'Smokewave P...',
-      'fullTitle': 'Smokewave Pattern Custom Jeans',
-      'designer': 'TEETHYS',
-      'image': 'assets/images/hoodie3.jpg',
-      'price': 'B5,400',
-      'category': 'Jeans',
-      'type': 'product',
-      'rating': 4.8,
-    },
-    {
-      'title': 'Saint | Custo...',
-      'fullTitle': 'Saint | Custom Hand Painted Black Jeans',
-      'designer': 'handcukk',
-      'image': 'assets/images/bracelet1.png',
-      'price': 'B1,899',
-      'category': 'Jeans',
-      'type': 'product',
-      'rating': 4.9,
-    },
-    {
-      'title': 'Floral Embroi...',
-      'fullTitle': 'Floral Embroidered White Shirt',
-      'designer': 'StitchDreams',
-      'image': 'assets/images/shirt1.jpg',
-      'price': 'B2,800',
-      'category': 'Shirt',
-      'type': 'product',
-      'rating': 4.7,
-    },
-  ];
+  // This will store favorited products - starts empty
+  List<Map<String, dynamic>> favoriteItems = [];
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _sortFavorites() {
+    setState(() {
+      switch (_sortBy) {
+        case 'Price: Low to High':
+          favoriteItems.sort((a, b) {
+            double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+            double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+            return priceA.compareTo(priceB);
+          });
+          break;
+        case 'Price: High to Low':
+          favoriteItems.sort((a, b) {
+            double priceA = double.parse(a['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+            double priceB = double.parse(b['price'].replaceAll(RegExp(r'[^0-9.]'), ''));
+            return priceB.compareTo(priceA);
+          });
+          break;
+        case 'Rating':
+          favoriteItems.sort((a, b) {
+            double ratingA = a['rating'] ?? 0.0;
+            double ratingB = b['rating'] ?? 0.0;
+            return ratingB.compareTo(ratingA);
+          });
+          break;
+        case 'Recently Added':
+          // Keep original order (most recent first)
+          // No need to sort as items are added to the end
+          favoriteItems = favoriteItems.reversed.toList();
+          break;
+      }
+    });
   }
 
   @override
@@ -71,7 +66,7 @@ class _FavoritePageState extends State<FavoritePage> {
           children: [
             _buildHeader(),
             _buildSearchBar(),
-            _buildFilters(),
+            if (favoriteItems.isNotEmpty) _buildFilters(),
             Expanded(
               child: favoriteItems.isEmpty
                   ? _buildEmptyState()
@@ -97,21 +92,22 @@ class _FavoritePageState extends State<FavoritePage> {
               color: Colors.black,
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFEEF2FF),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '${favoriteItems.length} items',
-              style: const TextStyle(
-                color: Color(0xFF6366F1),
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
+          if (favoriteItems.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFEEF2FF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${favoriteItems.length} items',
+                style: const TextStyle(
+                  color: Color(0xFF6366F1),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -138,15 +134,17 @@ class _FavoritePageState extends State<FavoritePage> {
               Icons.search,
               color: Colors.grey[400],
             ),
-            suffixIcon: IconButton(
-              onPressed: () {
-                _showSortOptions();
-              },
-              icon: Icon(
-                Icons.tune,
-                color: Colors.grey[700],
-              ),
-            ),
+            suffixIcon: favoriteItems.isNotEmpty
+                ? IconButton(
+                    onPressed: () {
+                      _showSortOptions();
+                    },
+                    icon: Icon(
+                      Icons.tune,
+                      color: Colors.grey[700],
+                    ),
+                  )
+                : null,
             border: InputBorder.none,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
@@ -498,7 +496,7 @@ class _FavoritePageState extends State<FavoritePage> {
             ),
             const SizedBox(height: 24),
             const Text(
-              'Sort & Filter',
+              'Sort By',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -518,27 +516,48 @@ class _FavoritePageState extends State<FavoritePage> {
   }
 
   Widget _buildSortOption(String title, IconData icon) {
+    final isSelected = _sortBy == title;
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.grey[100],
+          color: isSelected ? const Color(0xFF6366F1) : Colors.grey[100],
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: Colors.grey[700], size: 20),
+        child: Icon(
+          icon,
+          color: isSelected ? Colors.white : Colors.grey[700],
+          size: 20,
+        ),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: Colors.black,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          color: isSelected ? const Color(0xFF6366F1) : Colors.black,
         ),
       ),
+      trailing: isSelected
+          ? const Icon(
+              Icons.check_circle,
+              color: Color(0xFF6366F1),
+            )
+          : null,
       onTap: () {
+        setState(() {
+          _sortBy = title;
+        });
         Navigator.pop(context);
-        // Apply sort
+        _sortFavorites();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sorted by: $title'),
+            backgroundColor: Colors.black87,
+            duration: const Duration(seconds: 1),
+          ),
+        );
       },
     );
   }
