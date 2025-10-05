@@ -18,8 +18,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Women',
     'LGBTQ',
     'Accessories',
-    'Hoodies',
-    'Jackets',
   ];
 
   final List<Map<String, dynamic>> products = [
