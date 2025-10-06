@@ -9,12 +9,17 @@ class FavoritesManager extends ChangeNotifier {
 
   List<Map<String, dynamic>> get favoriteItems => List.unmodifiable(_favoriteItems);
 
-  bool isFavorite(int productId) {
-    return _favoriteItems.any((item) => item['id'] == productId);
+  // Changed from int to dynamic to handle both String and int IDs
+  bool isFavorite(dynamic productId) {
+    // Convert to string for comparison to handle both types
+    final idString = productId.toString();
+    return _favoriteItems.any((item) => item['id'].toString() == idString);
   }
 
   void toggleFavorite(Map<String, dynamic> product) {
-    final index = _favoriteItems.indexWhere((item) => item['id'] == product['id']);
+    // Convert to string for comparison
+    final productIdString = product['id'].toString();
+    final index = _favoriteItems.indexWhere((item) => item['id'].toString() == productIdString);
     
     if (index != -1) {
       // Remove from favorites
@@ -28,7 +33,8 @@ class FavoritesManager extends ChangeNotifier {
   }
 
   void removeFavorite(Map<String, dynamic> product) {
-    _favoriteItems.removeWhere((item) => item['id'] == product['id']);
+    final productIdString = product['id'].toString();
+    _favoriteItems.removeWhere((item) => item['id'].toString() == productIdString);
     notifyListeners();
   }
 

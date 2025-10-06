@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'product_detail.dart';
 import 'favorites_manager.dart';
+import 'product_service.dart';
 
 class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
@@ -14,7 +15,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
   final FavoritesManager _favoritesManager = FavoritesManager();
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _trendingKey = GlobalKey();
+  final ProductService _productService = ProductService();
+  
   String _selectedCategory = 'All';
+  List<Map<String, dynamic>> allProducts = [];
+  bool isLoading = true;
 
   final List<String> categories = [
     'All',
@@ -24,157 +29,31 @@ class _DiscoverPageState extends State<DiscoverPage> {
     'Accessories',
   ];
 
-  final List<Map<String, dynamic>> allProducts = [
-    // Men's Products
-    {
-      'id': 1,
-      'title': 'Saint Custom Jeans',
-      'price': 'B1,899',
-      'image': 'assets/images/pant1.jpg',
-      'fullTitle': 'Saint | Custom Hand Painted Black Jeans',
-      'category': 'Men',
-      'size': 'L',
-      'description':
-          'These jeans were inspired by the idea of angels and god. I hand-painted every detail to capture that energy, blending chaos and grace in each stroke. No two pieces are ever the same, and this one is truly one of a kind. Thank you for supporting handmade art and the stories we tell through it.',
-      'designer': 'handcukk',
-      'rating': 4.9,
-    },
-    {
-      'id': 2,
-      'title': 'Sun and Moon jeans',
-      'price': 'B5,400',
-      'image': 'assets/images/moon-jean.png',
-      'fullTitle': 'Sun and Moon | Custom hand painted jeans',
-      'category': 'Men',
-      'size': 'M',
-      'description':
-          'The design is inspired by the sum and moon animatronics from Five Nights At Freddy.',
-      'designer': 'handcukk',
-      'rating': 4.8,
-    },
-    {
-      'id': 3,
-      'title': 'Jesus is Lord Hoodie',
-      'price': 'B3,200',
-      'image': 'assets/images/hoodie1.jpg',
-      'fullTitle': 'Jesus is Lord Hoodie',
-      'category': 'Men',
-      'size': 'XL',
-      'description':
-          'Jesus is Lord themed hoodie with intricate hand-painted design. A bold statement piece for faith and fashion.',
-      'designer': 'ArtWear',
-      'rating': 4.7,
-    },
-    {
-      'id': 4,
-      'title': 'Rise In Hell',
-      'price': 'B2,999',
-      'image': 'assets/images/orange-skull-sweater.jpg',
-      'fullTitle': 'Urban Canvas | Rise In Hell Sweater',
-      'category': 'Men',
-      'size': 'L',
-      'description':
-          'No flesh, no corpse, but soul',
-      'designer': 'UrbanCanvas',
-      'rating': 4.6,
-    },
-    
-    // Women's Products
-    {
-      'id': 5,
-      'title': 'Snow White Sweater',
-      'price': 'B2,800',
-      'image': 'assets/images/snowwhite-jacket.jpg',
-      'fullTitle': 'Woahmen | Snow White hand painted jacket',
-      'category': 'Women',
-      'description':
-          'Snow White themed hand-painted jacket with elegant design. A fairy tale come to life in fashion.',
-      'designer': 'Woahmen',
-      'rating': 4.9,
-    },
-    {
-      'id': 6,
-      'title': 'Harajuku Hand Hoodie',
-      'price': 'B3,500',
-      'image': 'assets/images/harajuku-hoodie.jpg',
-      'fullTitle': 'Japanese Harajuku Hand Painted Hoodie',
-      'category': 'Women',
-      'size': 'S',
-      'description':
-          'Harajuku style hand-painted hoodie with vibrant colors and bold designs.',
-      'designer': 'ArtWear',
-      'rating': 4.8,
-    },
-    {
-      'id': 7,
-      'title': 'POWERFUL Women Vintage Jeans',
-      'price': 'B4,200',
-      'image': 'assets/images/cute-jean.jpg',
-      'fullTitle': 'POWERFUL Women Vintage Jeans',
-      'category': 'Women',
-      'size': 'M',
-      'description':
-          'Women empowerment themed vintage jeans with unique hand-painted design.',
-      'designer': 'Woahmen',
-      'rating': 4.7,
-    },
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+  }
 
-    // LGBTQ Products
-    {
-      'id': 9,
-      'title': 'Pride Painted Jacket',
-      'price': 'B3,800',
-      'image': 'assets/images/lgbtq-jacket.jpg',
-      'fullTitle': 'Pride Painted Hoodie',
-      'category': 'LGBTQ',
-      'size': 'L',
-      'description':
-          'Celebrate pride with this vibrant hand-painted design. Love is love.',
-      'designer': 'GaySlay',
-      'rating': 4.9,
-    },
+  // Load products from Firestore
+  Future<void> _loadProducts() async {
+    setState(() {
+      isLoading = true;
+    });
 
-    // Accessories
-    {
-      'id': 12,
-      'title': 'Faith Over Fear Bracelet',
-      'price': 'B890',
-      'image': 'assets/images/bracelet1.png',
-      'fullTitle': 'Faith Over Fear Custom Silver Bracelet',
-      'category': 'Accessories',
-      'size': 'One Size',
-      'description':
-          'Silver bracelet inspired by the power of believes in the Bible.',
-      'designer': 'Lord of All',
-      'rating': 4.8,
-    },
-    {
-      'id': 13,
-      'title': 'Jesus Ring',
-      'price': 'B1,200',
-      'image': 'assets/images/ring1.jpg',
-      'fullTitle': 'Custom made Jesus silver ring',
-      'category': 'Accessories',
-      'size': 'One Size',
-      'description':
-          'One of one silver ring with Jesus face engraved. Unique and meaningful.',
-      'designer': 'Lord of All',
-      'rating': 4.6,
-    },
-    {
-      'id': 14,
-      'title': 'Art Tote Bag',
-      'price': 'B1,500',
-      'image': 'assets/images/art-bag.jpg',
-      'fullTitle': 'Custom Art Tote Bag',
-      'category': 'Accessories',
-      'size': 'Large',
-      'description':
-          'Durable canvas tote with custom art. Eco-friendly and stylish.',
-      'designer': 'ArtWear',
-      'rating': 4.7,
-    },
-  ];
+    try {
+      final products = await _productService.getAllProducts();
+      setState(() {
+        allProducts = products;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading products: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   List<Map<String, dynamic>> get filteredProducts {
     if (_selectedCategory == 'All') {
@@ -196,24 +75,64 @@ class _DiscoverPageState extends State<DiscoverPage> {
             _buildSearchBar(),
             _buildCategories(),
             Expanded(
-              child: ListView(
-                controller: _scrollController,
-                padding: const EdgeInsets.all(24.0),
-                children: [
-                  _buildFeaturedSection(),
-                  const SizedBox(height: 32),
-                  Container(
-                    key: _trendingKey,
-                    child: _buildSectionHeader('Trending Now', 'See all'),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildProductsGrid(context),
-                  const SizedBox(height: 80),
-                ],
-              ),
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF6366F1),
+                      ),
+                    )
+                  : allProducts.isEmpty
+                      ? _buildEmptyState()
+                      : ListView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.all(24.0),
+                          children: [
+                            _buildFeaturedSection(),
+                            const SizedBox(height: 32),
+                            Container(
+                              key: _trendingKey,
+                              child: _buildSectionHeader('Trending Now', 'See all'),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildProductsGrid(context),
+                            const SizedBox(height: 80),
+                          ],
+                        ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.inventory_2_outlined,
+            size: 80,
+            color: Colors.grey[300],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No products found',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Check back later for new items',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[500],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -343,7 +262,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       },
       child: Container(
         width: double.infinity,
-        height: 220, // Increased from 180 to 220
+        height: 220,
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
@@ -388,7 +307,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                       height: 1.2,
                     ),
                   ),
-                  const SizedBox(height: 20), // Increased from 16 to 20 for more space
+                  const SizedBox(height: 20),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -410,7 +329,6 @@ class _DiscoverPageState extends State<DiscoverPage> {
                 ],
               ),
             ),
-            // Artist image on the right
             Positioned(
               right: 0,
               top: 20,
@@ -508,7 +426,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
     return AnimatedBuilder(
       animation: _favoritesManager,
       builder: (context, child) {
-        final isFavorite = _favoritesManager.isFavorite(product['id']);
+        // Convert ID to string to handle both int and String types
+        final productId = product['id'].toString();
+        final isFavorite = _favoritesManager.isFavorite(productId);
         
         return GestureDetector(
           onTap: () {
@@ -552,8 +472,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           topLeft: Radius.circular(16),
                           topRight: Radius.circular(16),
                         ),
-                        child: Image.asset(
-                          product['image'],
+                        child: Image.network(
+                          product['image'] ?? '',
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
@@ -562,6 +482,18 @@ class _DiscoverPageState extends State<DiscoverPage> {
                                 Icons.image,
                                 size: 40,
                                 color: Colors.grey,
+                              ),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFF6366F1),
                               ),
                             );
                           },
@@ -659,7 +591,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              product['title'],
+                              product['title'] ?? 'Untitled',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -686,7 +618,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              product['price'],
+                              product['price'] ?? 'B0',
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
