@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'favorites_manager.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -10,14 +11,8 @@ class ProductDetailPage extends StatefulWidget {
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  bool isFavorite = false;
+  final FavoritesManager _favoritesManager = FavoritesManager();
   bool showFullDescription = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isFavorite = widget.product['isFavorite'] ?? false;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -295,107 +290,125 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Widget _buildBottomButtons() {
-    return Container(
-      padding: const EdgeInsets.all(24.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // Add to Fav button
-          Expanded(
-            flex: 2,
-            child: OutlinedButton(
-              onPressed: () {
-                setState(() {
-                  isFavorite = !isFavorite;
-                });
-              },
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(
-                  color: Colors.grey[300]!,
-                  width: 1.5,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+    return AnimatedBuilder(
+      animation: _favoritesManager,
+      builder: (context, child) {
+        final isFavorite = _favoritesManager.isFavorite(widget.product['id']);
+        
+        return Container(
+          padding: const EdgeInsets.all(24.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -5),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_outline,
-                    color: isFavorite ? Colors.red : Colors.black,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Add to Fav',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+            ],
+          ),
+          child: Row(
+            children: [
+              // Add to Fav button
+              Expanded(
+                flex: 2,
+                child: OutlinedButton(
+                  onPressed: () {
+                    _favoritesManager.toggleFavorite(widget.product);
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          isFavorite 
+                              ? 'Removed from favorites' 
+                              : 'Added to favorites',
+                        ),
+                        backgroundColor: Colors.black87,
+                        duration: const Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: BorderSide(
+                      color: Colors.grey[300]!,
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          
-          const SizedBox(width: 12),
-          
-          // Buy Now button
-          Expanded(
-            flex: 2,
-            child: ElevatedButton(
-              onPressed: () {
-                // Buy now action
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Purchase functionality coming soon!'),
-                    backgroundColor: Color(0xFF6366F1),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_outline,
+                        color: isFavorite ? Colors.red : Colors.black,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Add to Fav',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF6366F1),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    Icons.shopping_bag_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  SizedBox(width: 8),
-                  Text(
-                    'Buy Now',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+              
+              const SizedBox(width: 12),
+              
+              // Buy Now button
+              Expanded(
+                flex: 2,
+                child: ElevatedButton(
+                  onPressed: () {
+                    // Buy now action
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Purchase functionality coming soon!'),
+                        backgroundColor: Color(0xFF6366F1),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                ],
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(
+                        Icons.shopping_bag_outlined,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Buy Now',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

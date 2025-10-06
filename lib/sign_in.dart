@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'sign_up.dart';
-import 'onboard.dart';
+import 'navbar.dart';
 import 'auth_service.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -69,11 +69,11 @@ class _SignInScreenState extends State<SignInScreen> {
         password: password,
       );
 
-      // Navigate to onboard screen on successful sign in
+      // Navigate to home screen (MainNavigation) on successful sign in
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const OnboardScreen()),
+          MaterialPageRoute(builder: (context) => const MainNavigation()),
         );
       }
     } on AuthException catch (e) {

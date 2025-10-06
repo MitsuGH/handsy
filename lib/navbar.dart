@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'profile.dart';
-import 'favorite.dart';
-import 'discover.dart';
 import 'home.dart';
+import 'discover.dart';
 import 'customize.dart';
+import 'favorite.dart';
+import 'profile.dart';
 
 class MainNavigation extends StatefulWidget {
   const MainNavigation({super.key});
@@ -14,7 +14,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation>
     with TickerProviderStateMixin {
-  int _selectedIndex = 4; // Start on Profile tab instead of Home (index 0)
+  int _selectedIndex = 0; // Changed from 4 to 0 to start on Home tab
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
 
@@ -23,7 +23,7 @@ class _MainNavigationState extends State<MainNavigation>
     const DiscoverPage(),
     const CustomizePage(),
     const FavoritePage(),
-    const ProfilePage(), // This will be the starting page
+    const ProfilePage(),
   ];
 
   @override
@@ -133,9 +133,7 @@ class _MainNavigationState extends State<MainNavigation>
               ),
             ],
             currentIndex: _selectedIndex,
-            selectedItemColor: const Color(
-              0xFF8B5CF6,
-            ), // Updated to your brand color
+            selectedItemColor: const Color(0xFF8B5CF6),
             unselectedItemColor: Colors.grey[600],
             selectedFontSize: 12,
             unselectedFontSize: 12,
