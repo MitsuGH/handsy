@@ -86,6 +86,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
       'price': 'B2,800',
       'image': 'assets/images/snowwhite-jacket.jpg',
       'fullTitle': 'Woahmen | Snow White hand painted jacket',
+      'category': 'Women',
       'description':
           'Snow White themed hand-painted jacket with elegant design. A fairy tale come to life in fashion.',
       'designer': 'Woahmen',
