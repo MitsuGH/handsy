@@ -101,78 +101,79 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildStories() {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: stories.length,
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 10.0),
-        itemBuilder: (context, index) {
-          final story = stories[index];
-          final isAdd = story['isAdd'] == 'true';
-          
-          return Container(
-            width: 72,
-            margin: const EdgeInsets.symmetric(horizontal: 4.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: isAdd ? null : const LinearGradient(
-                      colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                    ),
-                    border: isAdd ? Border.all(color: Colors.grey[300]!, width: 2) : null,
+  return Container(
+    height: 110, // Increased from 100 to prevent overflow
+    padding: const EdgeInsets.symmetric(vertical: 10.0),
+    child: ListView.builder(
+      scrollDirection: Axis.horizontal,
+      itemCount: stories.length,
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      itemBuilder: (context, index) {
+        final story = stories[index];
+        final isAdd = story['isAdd'] == 'true';
+        
+        return Container(
+          width: 72,
+          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: isAdd ? null : const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(isAdd ? 0 : 2.5),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isAdd ? Colors.grey[100] : Colors.white,
-                      ),
-                      child: isAdd
-                          ? Icon(Icons.add, color: Colors.grey[600], size: 28)
-                          : Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: ClipOval(
-                                child: Image.asset(
-                                  story['avatar']!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.person, color: Colors.grey),
-                                    );
-                                  },
-                                ),
+                  border: isAdd ? Border.all(color: Colors.grey[300]!, width: 2) : null,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(isAdd ? 0 : 2.5),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isAdd ? Colors.grey[100] : Colors.white,
+                    ),
+                    child: isAdd
+                        ? Icon(Icons.add, color: Colors.grey[600], size: 28)
+                        : Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: ClipOval(
+                              child: Image.asset(
+                                story['avatar']!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.person, color: Colors.grey),
+                                  );
+                                },
                               ),
                             ),
-                    ),
+                          ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  story['name']!,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey[700],
-                    fontWeight: FontWeight.w500,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              Text(
+                story['name']!,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey[700],
+                  fontWeight: FontWeight.w500,
                 ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildPost(Map<String, dynamic> post, int index) {
     return Column(
