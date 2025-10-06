@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-import 'request_manager.dart';
 class CustomizePage extends StatefulWidget {
   const CustomizePage({super.key});
 

@@ -43,7 +43,20 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _signIn() async {
-    if (!_formKey.currentState!.validate()) return;
+    // Validate form first
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      return;
+    }
+
+    // Get trimmed values
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+    
+    // Double-check fields aren't empty
+    if (email.isEmpty || password.isEmpty) {
+      _showErrorMessage('Email and password are required.');
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -52,8 +65,8 @@ class _SignInScreenState extends State<SignInScreen> {
 
     try {
       await _authService.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
+        email: email,
+        password: password,
       );
 
       // Navigate to onboard screen on successful sign in
@@ -66,7 +79,7 @@ class _SignInScreenState extends State<SignInScreen> {
     } on AuthException catch (e) {
       _showErrorMessage(e.message);
     } catch (e) {
-      _showErrorMessage('An unexpected error occurred. Please try again.');
+      _showErrorMessage('Authentication failed. Please check your credentials.');
     } finally {
       if (mounted) {
         setState(() {
@@ -153,21 +166,16 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
 
                 // Welcome Back text
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'Welcome\nBack',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          height: 1.2,
-                        ),
-                      ),
-                    ],
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 32.0),
+                  child: Text(
+                    'Welcome\nBack',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 40,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                    ),
                   ),
                 ),
 
@@ -266,10 +274,10 @@ class _SignInScreenState extends State<SignInScreen> {
                             alignment: Alignment.centerRight,
                             child: TextButton(
                               onPressed: _forgotPassword,
-                              child: Text(
+                              child: const Text(
                                 'Forgot Password?',
                                 style: TextStyle(
-                                  color: const Color(0xFF6C5CE7),
+                                  color: Color(0xFF6C5CE7),
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
