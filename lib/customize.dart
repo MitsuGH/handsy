@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'request_manager.dart';
 class CustomizePage extends StatefulWidget {
   const CustomizePage({super.key});
 
@@ -11,6 +13,7 @@ class _CustomizePageState extends State<CustomizePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
 
   final List<Map<String, dynamic>> designers = [
     {
@@ -71,6 +74,7 @@ class _CustomizePageState extends State<CustomizePage>
       'deadline': '2 weeks',
       'offers': 8,
       'category': 'Jacket',
+      'isOwn': false,
     },
     {
       'user': 'styleking',
@@ -82,6 +86,7 @@ class _CustomizePageState extends State<CustomizePage>
       'deadline': '1 week',
       'offers': 12,
       'category': 'Hoodie',
+      'isOwn': false,
     },
     {
       'user': 'fashionista_bkk',
@@ -93,6 +98,7 @@ class _CustomizePageState extends State<CustomizePage>
       'deadline': '3 weeks',
       'offers': 15,
       'category': 'Jeans',
+      'isOwn': false,
     },
   ];
 
@@ -606,29 +612,46 @@ class _CustomizePageState extends State<CustomizePage>
             ),
           ),
           const SizedBox(height: 12),
-          // Image
-          Container(
-            height: 200,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                request['image'],
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey[200],
-                    ),
-                    child: const Icon(Icons.image, size: 40, color: Colors.grey),
-                  );
-                },
+          // Image - only show if image exists
+          if (request['image'] != null && request['image'].toString().isNotEmpty)
+            Container(
+              height: 200,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: request['image'].toString().startsWith('assets/')
+                    ? Image.asset(
+                        request['image'],
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[200],
+                            ),
+                            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                          );
+                        },
+                      )
+                    : Image.file(
+                        File(request['image']),
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.grey[200],
+                            ),
+                            child: const Icon(Icons.image, size: 40, color: Colors.grey),
+                          );
+                        },
+                      ),
               ),
             ),
-          ),
-          const SizedBox(height: 12),
+          if (request['image'] != null && request['image'].toString().isNotEmpty)
+            const SizedBox(height: 12),
           // Info tags
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -655,34 +678,35 @@ class _CustomizePageState extends State<CustomizePage>
             ),
           ),
           const SizedBox(height: 12),
-          // Action button
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  _showOfferDialog(request['user']);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          // Action button - only show if not own request
+          if (request['isOwn'] != true)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    _showOfferDialog(request['user']);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
-                child: const Text(
-                  'Make an Offer',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                  child: const Text(
+                    'Make an Offer',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -828,6 +852,7 @@ class _CustomizePageState extends State<CustomizePage>
     final budgetController = TextEditingController();
     String selectedCategory = 'Jacket';
     final categories = ['Jacket', 'Hoodie', 'Jeans', 'Shirt', 'Accessories'];
+    String? selectedImagePath;
 
     showModalBottomSheet(
       context: context,
@@ -964,8 +989,28 @@ class _CustomizePageState extends State<CustomizePage>
                         ),
                         const SizedBox(height: 20),
                         GestureDetector(
-                          onTap: () {
-                            // Upload image action
+                          onTap: () async {
+                            try {
+                              final XFile? image = await _picker.pickImage(
+                                source: ImageSource.gallery,
+                                maxWidth: 1200,
+                                maxHeight: 1200,
+                                imageQuality: 85,
+                              );
+                              
+                              if (image != null) {
+                                setModalState(() {
+                                  selectedImagePath = image.path;
+                                });
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to pick image: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                           child: Container(
                             height: 150,
@@ -979,25 +1024,62 @@ class _CustomizePageState extends State<CustomizePage>
                                 width: 2,
                               ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add_photo_alternate_outlined,
-                                  size: 48,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Upload item photo (optional)',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                    fontWeight: FontWeight.w500,
+                            child: selectedImagePath == null
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.add_photo_alternate_outlined,
+                                        size: 48,
+                                        color: Colors.grey[400],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Upload item photo (optional)',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Image.file(
+                                          File(selectedImagePath!),
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 8,
+                                        right: 8,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            setModalState(() {
+                                              selectedImagePath = null;
+                                            });
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                           ),
                         ),
                         const SizedBox(height: 32),
@@ -1028,15 +1110,16 @@ class _CustomizePageState extends State<CustomizePage>
 
                               // Create new request
                               final newRequest = {
-                                'user': 'You', // In a real app, this would be the current user
+                                'user': 'You',
                                 'avatar': 'assets/images/default-avatar.jpg',
                                 'time': 'Just now',
                                 'description': descriptionController.text,
-                                'image': 'assets/images/placeholder.jpg', // Placeholder image
+                                'image': selectedImagePath ?? '',
                                 'budget': '฿${budgetController.text}',
                                 'deadline': 'To be discussed',
                                 'offers': 0,
                                 'category': selectedCategory,
+                                'isOwn': true,
                               };
 
                               // Add to requests list
